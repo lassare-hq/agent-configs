@@ -19,9 +19,10 @@ We're preparing setup guides for:
 
 Lassare enables human-in-the-loop workflows for AI agents. When your coding agent needs to ask you a question, it sends it to your Slack DM - so you can respond from your phone while AFK.
 
-## Issues & Feedback
+## Support
 
-Found a bug or have a suggestion? [Open an issue](https://github.com/lassare-hq/agent-prompts/issues) on this repo.
+- **Questions & Discussions**: [GitHub Discussions](https://github.com/lassare-hq/docs/discussions)
+- **Bug Reports**: [Open an issue](https://github.com/lassare-hq/agent-prompts/issues) on this repo
 
 ## Links
 
