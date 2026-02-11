@@ -8,13 +8,9 @@ Lassare enables human-in-the-loop workflows for AI agents. When your coding agen
 
 ### Tested & Documented
 
-| Agent | Hooks | Commands |
-|-------|-------|----------|
-| [Claude Code](./claude-code/) | ✅ | `/lassare-slack`, `/lassare-inline` |
-| [Cursor](./cursor/) | ✅ | `/lassare-slack`, `/lassare-inline` |
-| [Gemini CLI](./gemini/) | ✅ | `/lassare-slack`, `/lassare-inline` |
-
-Each includes MCP config, slash commands, and optional hooks for permission gating.
+- **[Claude Code](./claude-code/)** — MCP config, slash commands, hooks
+- **[Cursor](./cursor/)** — MCP config, slash commands, hooks
+- **[Gemini CLI](./gemini/)** — MCP config, slash commands, hooks
 
 ### Other MCP Clients
 
@@ -32,16 +28,16 @@ Lassare works with any MCP-compatible agent. Use the [generic config](./other/) 
 ## How It Works
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│ Your Agent  │────▶│   Lassare   │────▶│ Your Slack  │
-│ (ask/approve)│    │   (MCP)     │     │ (DM/mobile) │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ You respond │
-                    │ (from phone)│
-                    └─────────────┘
+┌────────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Your Agent    │────▶│   Lassare   │────▶│ Your Slack  │
+│ (ask / approve)│     │   (MCP)     │     │ (DM/mobile) │
+└────────────────┘     └─────────────┘     └─────────────┘
+                              │
+                              ▼
+                       ┌─────────────┐
+                       │ You respond │
+                       │ (from phone)│
+                       └─────────────┘
 ```
 
 **Two tools:**
