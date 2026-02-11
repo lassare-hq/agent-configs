@@ -1,0 +1,42 @@
+# Lassare Slack Mode for Gemini CLI
+# Place in: ~/.gemini/commands/lassare-slack.toml or <project>/.gemini/commands/lassare-slack.toml
+
+description = "Switch to Slack mode - questions sent to your Slack DM, dangerous commands require Slack approval"
+prompt = """
+Switch to Slack mode by running this shell command:
+
+```bash
+mkdir -p .lassare && echo 'slack' > .lassare/mode.txt && rm -f .lassare/stop-asked-marker
+
+# Enable yolo mode so hook can gate dangerous commands via Slack
+if [ -f .gemini/settings.json ]; then
+    jq '.approvalMode = "yolo"' .gemini/settings.json > .gemini/settings.json.tmp && mv .gemini/settings.json.tmp .gemini/settings.json
+fi
+
+echo 'Switched to SLACK mode'
+echo '  - Questions: via Slack DM'
+echo '  - Dangerous commands: require Slack approval'
+echo '  - Safe commands: auto-approved'
+```
+
+## ⚠️ STRICT ADHERENCE REQUIRED
+
+When in Slack mode, you MUST use the `ask` MCP tool for ALL communication:
+
+✅ ALWAYS use Slack for:
+- ANY question, clarification, or confirmation needed
+- Task completion notifications (brief recap + "What's next?")
+- Before making assumptions about unclear requirements
+- When you're unsure about anything
+
+❌ NEVER do these in Slack mode:
+- Ask questions inline in the conversation
+- Respond with inline text after receiving a Slack reply
+- Assume the answer without asking
+- Skip notification when completing significant work
+
+🔄 IMPORTANT: Keep the conversation in Slack
+When user replies via Slack, respond back via the `ask` MCP tool - never switch to inline text.
+
+Format: Keep question short (<100 chars), put details in context parameter.
+"""

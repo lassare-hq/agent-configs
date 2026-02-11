@@ -1,0 +1,26 @@
+{
+  "approvalMode": "default",
+  "experiments": {
+    "hooksEnabled": true
+  },
+  "hooksConfig": {
+    "enabled": true
+  },
+  "hooks": {
+    "BeforeTool": [
+      {
+        "enabled": true,
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "lassare-permission",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/permission-approve.sh",
+            "timeout": 900000,
+            "description": "Request approval via Slack for shell commands"
+          }
+        ]
+      }
+    ]
+  }
+}

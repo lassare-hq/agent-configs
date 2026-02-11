@@ -1,0 +1,22 @@
+# Lassare Inline Mode for Gemini CLI
+# Place in: ~/.gemini/commands/lassare-inline.toml or <project>/.gemini/commands/lassare-inline.toml
+
+description = "Switch to inline mode - questions asked directly, Gemini CLI handles approvals"
+prompt = """
+Switch to inline mode by running this shell command:
+
+```bash
+mkdir -p .lassare && echo 'inline' > .lassare/mode.txt && rm -f .lassare/stop-asked-marker
+
+# Disable yolo mode so Gemini CLI handles approvals
+if [ -f .gemini/settings.json ]; then
+    jq '.approvalMode = "default"' .gemini/settings.json > .gemini/settings.json.tmp && mv .gemini/settings.json.tmp .gemini/settings.json
+fi
+
+echo 'Switched to INLINE mode'
+echo '  - Questions: asked directly in conversation'
+echo '  - Approvals: handled by Gemini CLI'
+```
+
+Ask questions directly in this conversation. Gemini CLI will prompt for approval on risky commands.
+"""

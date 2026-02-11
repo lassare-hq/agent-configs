@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "lassare": {
+      "type": "http",
+      "url": "https://mcp.lassare.com/mcp",
+      "timeout": 900000,
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}

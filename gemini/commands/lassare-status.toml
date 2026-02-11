@@ -1,0 +1,17 @@
+# Lassare Mode Status for Gemini CLI
+# Place in: ~/.gemini/commands/lassare-status.toml
+
+description = "Show current Lassare Slack/inline mode"
+prompt = """
+Check the current Lassare communication mode by running:
+
+```bash
+if [ -f ".lassare/mode.txt" ]; then
+  echo "Mode: $(cat .lassare/mode.txt | tr -d '[:space:]')"
+else
+  echo "Mode: slack (default)"
+fi
+```
+
+To change mode, run `/lassare-slack` or `/lassare-inline`.
+"""
