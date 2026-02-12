@@ -72,7 +72,7 @@ if echo "$ANSWER" | grep -qiE '\b(not|don.t|do not|never)\b'; then
     # Negation detected — user does NOT want to stop, treat as a task
     touch "$STOP_MARKER"
     ESCAPED_ANSWER=$(printf '%s' "$ANSWER" | jq -Rs '.' | sed 's/^"//;s/"$//')
-    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nUser responded via Slack with a new task. Please address: $ESCAPED_ANSWER\"}"
+    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nUser responded via Slack with a new task. Please address: $ESCAPED_ANSWER\\n\\n[After completing this task, run: rm -f .lassare/stop-asked-marker]\"}"
     exit 0
 fi
 if echo "$ANSWER" | grep -qiE '\b(no|done|stop|nope|nothing|bye|exit|quit|end|finished|that.s all|all good)\b'; then
@@ -88,7 +88,7 @@ if [ -n "$ANSWER" ]; then
     touch "$STOP_MARKER"
     # Escape answer for safe JSON embedding
     ESCAPED_ANSWER=$(printf '%s' "$ANSWER" | jq -Rs '.' | sed 's/^"//;s/"$//')
-    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nUser responded via Slack with a new task. Please address: $ESCAPED_ANSWER\"}"
+    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nUser responded via Slack with a new task. Please address: $ESCAPED_ANSWER\\n\\n[After completing this task, run: rm -f .lassare/stop-asked-marker]\"}"
 else
     # No response or timeout - switch to inline, clean marker, allow stop
     echo "inline" > "$MODE_FILE"

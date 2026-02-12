@@ -67,7 +67,8 @@ ANSWER=$(echo "$RESULT_LINE" | jq -r '.result.content[0].text // ""' 2>/dev/null
 if echo "$ANSWER" | grep -qiE '\b(not|don.t|do not|never)\b'; then
     # Negation detected — user does NOT want to stop, treat as a task
     touch "$STOP_MARKER"
-    ANSWER_ESCAPED=$(printf '%s' "$ANSWER" | jq -Rs '.')
+    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f .lassare/stop-asked-marker]' "$ANSWER")
+    ANSWER_ESCAPED=$(printf '%s' "$ANSWER_WITH_CLEANUP" | jq -Rs '.')
     echo "{\"followup_message\": $ANSWER_ESCAPED}"
     exit 0
 fi
@@ -81,7 +82,8 @@ fi
 if [ -n "$ANSWER" ]; then
     touch "$STOP_MARKER"
     # Escape JSON to prevent injection
-    ANSWER_ESCAPED=$(printf '%s' "$ANSWER" | jq -Rs '.')
+    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f .lassare/stop-asked-marker]' "$ANSWER")
+    ANSWER_ESCAPED=$(printf '%s' "$ANSWER_WITH_CLEANUP" | jq -Rs '.')
     echo "{\"followup_message\": $ANSWER_ESCAPED}"
     exit 0
 else
