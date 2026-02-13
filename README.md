@@ -68,7 +68,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guideline
 - [Portal](https://portal.lassare.com) — Get your API key
 - [Status](https://status.lassare.com) — Service status and uptime
 - [Feedback & Issues](https://github.com/lassare-hq/agent-configs/issues)
-- [hello@lassare.com](mailto:hello@lassare.com) — Support
+- [support@lassare.com](mailto:support@lassare.com) — Support
 
 ## License
 
