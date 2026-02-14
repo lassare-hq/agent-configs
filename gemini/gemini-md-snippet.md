@@ -9,6 +9,7 @@ After session resume, check `.lassare/mode.txt` and run the matching command:
 - Notify via Slack when completing significant work
 - Ask via Slack before making assumptions — don't guess
 - Keep questions short (<100 chars), put details in the `context` field
+- In the `context` field, use real line breaks for readability — never use literal `\n` characters
 - When user replies via Slack, respond back via Slack — never switch to inline
 
 **Commands:**

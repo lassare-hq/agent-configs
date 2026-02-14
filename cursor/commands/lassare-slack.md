@@ -35,6 +35,7 @@ When user replies via Slack, you MUST respond back via the `ask` MCP tool - neve
 
 - Keep question short (<100 chars) - this is the Slack message title
 - Put ALL details in `context` parameter
+- In `context`, use real line breaks for readability — NEVER use literal `\n` characters
 - User responds from phone, keep it scannable
 
 ## Examples
@@ -42,17 +43,24 @@ When user replies via Slack, you MUST respond back via the `ask` MCP tool - neve
 **Task completion:**
 ```
 question: "Admin portal changes done. What's next?"
-context: "Completed: plan filter, clickable companies, user list fix. Ready to commit."
+context: "Completed:
+- Plan filter
+- Clickable companies
+- User list fix
+
+Ready to commit."
 ```
 
 **Clarification:**
 ```
 question: "Should activity log show user email or ID?"
-context: "Currently shows obfuscated email. Could show user_id instead for better privacy."
+context: "Currently shows obfuscated email.
+Could show user_id instead for better privacy."
 ```
 
 **Before assuming:**
 ```
 question: "No tests exist for this. Should I add them?"
-context: "Adding plan filter to companies list. No existing test coverage for filters."
+context: "Adding plan filter to companies list.
+No existing test coverage for filters."
 ```

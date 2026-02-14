@@ -39,4 +39,5 @@ When in Slack mode, you MUST use the `ask` MCP tool for ALL communication:
 When user replies via Slack, respond back via the `ask` MCP tool - never switch to inline text.
 
 Format: Keep question short (<100 chars), put details in context parameter.
+In the context field, use real line breaks for readability — NEVER use literal \\n characters.
 """
