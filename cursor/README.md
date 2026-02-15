@@ -18,7 +18,7 @@ Setup instructions for integrating Lassare with [Cursor](https://cursor.sh).
 ### 1. Create directories
 
 ```bash
-mkdir -p .cursor/commands .lassare
+mkdir -p .cursor/commands .cursor/scripts .lassare
 ```
 
 ### 2. Add MCP config
@@ -33,10 +33,12 @@ If `.cursor/mcp.json` **already exists**, manually add the `lassare` entry from 
 
 Then replace `YOUR_API_KEY` with your API key.
 
-### 3. Copy commands
+### 3. Copy commands and scripts
 
 ```bash
 cp commands/*.md .cursor/commands/
+cp scripts/*.sh .cursor/scripts/
+chmod +x .cursor/scripts/*.sh
 ```
 
 ### 4. Set default mode
@@ -135,6 +137,7 @@ cat lassare-rules.txt >> .cursorrules
 
 - `mcp.json` — MCP server configuration
 - `commands/*.md` — Slash commands
+- `scripts/*.sh` — Mode switching scripts (called by commands)
 - `hooks/permission-approve.sh` — Permission hook (optional)
 - `hooks/stop-notify.sh` — Stop hook (optional)
 - `hooks/hooks.json.example` — Hook config example

@@ -6,8 +6,7 @@ scope: user
 # Lassare Slack Mode
 
 ```bash
-mkdir -p .lassare && echo "slack" > .lassare/mode.txt && rm -f .lassare/stop-asked-marker
-echo "Switched to SLACK mode"
+.claude/scripts/lassare-slack.sh
 ```
 
 ## ⚠️ STRICT ADHERENCE REQUIRED

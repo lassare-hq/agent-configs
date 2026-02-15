@@ -6,8 +6,7 @@ scope: user
 # Lassare Inline Mode
 
 ```bash
-mkdir -p .lassare && echo "inline" > .lassare/mode.txt && rm -f .lassare/stop-asked-marker
-echo "Switched to INLINE mode"
+.cursor/scripts/lassare-inline.sh
 ```
 
 Ask questions directly in this conversation.

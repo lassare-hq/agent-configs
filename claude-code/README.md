@@ -18,7 +18,7 @@ Setup instructions for integrating Lassare with [Claude Code](https://claude.ai/
 ### 1. Create directories
 
 ```bash
-mkdir -p .claude/commands .lassare
+mkdir -p .claude/commands .claude/scripts .lassare
 ```
 
 ### 2. Add MCP config
@@ -33,10 +33,12 @@ If `.mcp.json` **already exists**, manually add the `lassare` entry from `mcp.js
 
 Then replace `YOUR_API_KEY` with your API key.
 
-### 3. Copy commands
+### 3. Copy commands and scripts
 
 ```bash
 cp commands/*.md .claude/commands/
+cp scripts/*.sh .claude/scripts/
+chmod +x .claude/scripts/*.sh
 ```
 
 ### 4. Set default mode
@@ -148,6 +150,7 @@ cat claude-md-snippet.md >> CLAUDE.md
 
 - `mcp.json` — MCP server configuration
 - `commands/*.md` — Slash commands
+- `scripts/*.sh` — Mode switching scripts (called by commands)
 - `hooks/permission-approve.sh` — Permission hook (optional)
 - `hooks/stop-notify.sh` — Stop hook (optional)
 - `hooks/session-start.sh` — Session start hook (optional)
