@@ -196,7 +196,9 @@ For an extra safety net in inline mode, enable the OS dialog:
 /lassare-dialog-on
 ```
 
-This shows a native popup (macOS: osascript, Windows: PowerShell, Linux: zenity/kdialog) for dangerous commands, even with YOLO mode on. Disable with `/lassare-dialog-off`.
+This shows a native popup for dangerous commands, even with YOLO mode on. Disable with `/lassare-dialog-off`.
+
+Supported platforms: macOS (osascript, tested), Windows (PowerShell, untested), Linux (zenity/kdialog, untested).
 
 ## Optional: GEMINI.md Snippet
 
