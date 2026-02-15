@@ -1,0 +1,12 @@
+# Lassare Dialog Off - Disable OS dialog for dangerous commands in inline mode
+
+description = "Disable native OS dialog approval, let Gemini CLI handle approvals"
+prompt = """
+Disable the inline approval dialog by running:
+
+```bash
+.gemini/scripts/lassare-dialog-off.sh
+```
+
+Confirm to the user: dangerous commands in inline mode will now be handled by Gemini CLI's native approval flow. **Remind them to disable YOLO mode (Ctrl+Y)** if they want Gemini to prompt before running dangerous commands.
+"""

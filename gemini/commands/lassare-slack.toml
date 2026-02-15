@@ -1,23 +1,17 @@
 # Lassare Slack Mode for Gemini CLI
-# Place in: ~/.gemini/commands/lassare-slack.toml or <project>/.gemini/commands/lassare-slack.toml
 
 description = "Switch to Slack mode - questions sent to your Slack DM, dangerous commands require Slack approval"
 prompt = """
 Switch to Slack mode by running this shell command:
 
 ```bash
-mkdir -p .lassare && echo 'slack' > .lassare/mode.txt && rm -f .lassare/stop-asked-marker
-
-# Enable yolo mode so hook can gate dangerous commands via Slack
-if [ -f .gemini/settings.json ]; then
-    jq '.approvalMode = "yolo"' .gemini/settings.json > .gemini/settings.json.tmp && mv .gemini/settings.json.tmp .gemini/settings.json
-fi
-
-echo 'Switched to SLACK mode'
-echo '  - Questions: via Slack DM'
-echo '  - Dangerous commands: require Slack approval'
-echo '  - Safe commands: auto-approved'
+.gemini/scripts/lassare-slack.sh
 ```
+
+## ⚠️ IMPORTANT: Enable YOLO mode
+
+Slack mode requires YOLO mode so the hook can gate dangerous commands via Slack.
+**Remind the user to press Ctrl+Y to enable YOLO mode** (or launch with `gemini --yolo`).
 
 ## ⚠️ STRICT ADHERENCE REQUIRED
 

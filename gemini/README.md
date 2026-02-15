@@ -18,7 +18,7 @@ Setup instructions for integrating Lassare with [Gemini CLI](https://github.com/
 ### 1. Create directories
 
 ```bash
-mkdir -p .gemini/commands .lassare
+mkdir -p .gemini/commands .gemini/scripts .lassare
 ```
 
 ### 2. Add MCP config
@@ -33,10 +33,12 @@ If `.gemini/settings.json` **already exists**, manually add the `lassare` entry 
 
 Then replace `YOUR_API_KEY` with your API key.
 
-### 3. Copy commands
+### 3. Copy commands and scripts
 
 ```bash
 cp commands/*.toml .gemini/commands/
+cp scripts/*.sh .gemini/scripts/
+chmod +x .gemini/scripts/*.sh
 ```
 
 ### 4. Set default mode
@@ -60,7 +62,25 @@ Restart Gemini CLI. Try `/lassare-status` to confirm mode.
 
 Questions and approvals expire after **15 minutes** if not answered.
 
-Toggle with `/lassare-slack` or `/lassare-inline`.
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/lassare-slack` | Switch to Slack mode |
+| `/lassare-inline` | Switch to inline mode |
+| `/lassare-status` | Show current mode and settings |
+| `/lassare-dialog-on` | Enable OS dialog for dangerous commands (inline mode) |
+| `/lassare-dialog-off` | Disable OS dialog |
+
+### YOLO mode
+
+| Mode | YOLO | Behavior |
+|------|------|----------|
+| Slack | ON (recommended) | Hook gates dangerous commands via Slack, safe commands auto-approve |
+| Slack | OFF | Double prompting (Gemini native + Slack) — works but annoying |
+| Inline | OFF (recommended) | Gemini CLI prompts for dangerous commands |
+| Inline + dialog ON | ON or OFF | Hook shows OS popup for dangerous commands |
+| Inline + dialog OFF | ON | **No safety net** — dangerous commands run without any approval |
 
 ## Optional: Hooks (Recommended for Slack Mode)
 
@@ -101,7 +121,22 @@ Add the following to your existing `.gemini/settings.json`:
             "name": "lassare-permission",
             "type": "command",
             "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/permission-approve.sh",
-            "timeout": 900000
+            "timeout": 900000,
+            "description": "Request approval via Slack for shell commands"
+          }
+        ]
+      }
+    ],
+    "AfterAgent": [
+      {
+        "enabled": true,
+        "hooks": [
+          {
+            "name": "lassare-stop-notify",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/stop-notify.sh",
+            "timeout": 900000,
+            "description": "Ask user via Slack before stopping (Slack mode only)"
           }
         ]
       }
@@ -118,10 +153,19 @@ Add the following to your existing `.gemini/settings.json`:
 
 ### How hooks work
 
-1. `/lassare-slack` sets `approvalMode: "yolo"` (Gemini auto-approves everything)
-2. Hook intercepts and gates **dangerous** commands via Slack
-3. Safe commands pass through without Slack prompt
-4. `/lassare-inline` sets `approvalMode: "default"` (Gemini CLI handles approvals)
+**Permission hook (BeforeTool):**
+1. Auto-allows lassare scripts, `.lassare/` file operations, and MCP tools
+2. Checks dangerous command patterns against a built-in list
+3. In Slack mode: gates dangerous commands via Slack approval buttons
+4. In inline mode + dialog ON: shows native OS popup (macOS/Windows/Linux)
+5. In inline mode + dialog OFF: passes through, lets Gemini handle it
+6. Fail-closed in Slack mode: errors deny dangerous commands
+
+**Stop hook (AfterAgent):**
+1. Only active in Slack mode (exits immediately in inline mode)
+2. Asks "Anything else?" via Slack when Gemini is about to stop
+3. User can reply with a new task (agent continues) or say "done" (agent stops)
+4. On timeout/no response: allows stop, switches to inline mode
 
 ### Dangerous commands (blocked in Slack mode)
 
@@ -144,6 +188,16 @@ Add the following to your existing `.gemini/settings.json`:
 }
 ```
 
+### Inline dialog (OS popup)
+
+For an extra safety net in inline mode, enable the OS dialog:
+
+```
+/lassare-dialog-on
+```
+
+This shows a native popup (macOS: osascript, Windows: PowerShell, Linux: zenity/kdialog) for dangerous commands, even with YOLO mode on. Disable with `/lassare-dialog-off`.
+
 ## Optional: GEMINI.md Snippet
 
 Add Lassare instructions to your project's `GEMINI.md` so they persist across context compressions:
@@ -159,6 +213,13 @@ If it **already exists**, append the snippet:
 ```bash
 cat gemini-md-snippet.md >> GEMINI.md
 ```
+
+## Known Limitations
+
+- ANSI color codes are not rendered in Gemini CLI shell output
+- `/hooks disable` cannot be toggled programmatically by the agent (security guardrail)
+- "Running hook..." message appears even when hooks exit early (cosmetic)
+- `tools.allowed` syntax for auto-approving specific scripts is untested
 
 ## Compatibility
 
@@ -187,6 +248,8 @@ cat gemini-md-snippet.md >> GEMINI.md
 ## Files
 
 - `mcp.json` — MCP server configuration
-- `commands/*.toml` — Slash commands
-- `hooks/permission-approve.sh` — Permission hook (optional)
+- `commands/*.toml` — Slash commands (5 commands)
+- `scripts/*.sh` — Shell scripts called by commands (5 scripts)
+- `hooks/permission-approve.sh` — Permission hook (optional, recommended)
+- `hooks/stop-notify.sh` — Stop notification hook (optional, recommended)
 - `gemini-md-snippet.md` — GEMINI.md snippet (optional, recommended)
