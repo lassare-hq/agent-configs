@@ -11,28 +11,14 @@ Setup instructions for integrating Lassare with [Cursor](https://cursor.sh).
 - A Lassare account ([portal.lassare.com](https://portal.lassare.com))
 - Slack workspace connected (Portal → Agent Setup)
 - An API key (Portal → Agent Setup)
-- Cursor installed with hooks support
-
-## How It Works
-
-Lassare has two modes:
-
-- **Inline mode** (default) — Questions asked directly in the Cursor conversation. YOLO mode is off; Cursor's built-in approval UI handles command permissions.
-- **Slack mode** — Questions and approvals sent to your Slack DM. YOLO mode is enabled automatically so the agent can work unattended. A permission hook gates dangerous commands (`rm -rf`, `git push --force`, `sudo`, etc.) via Slack approval buttons — you approve or deny from your phone.
-
-Switching modes (`/lassare-slack`, `/lassare-inline`) automatically toggles YOLO mode in `.vscode/settings.json`. This means:
-
-- **Slack mode**: YOLO on — the permission hook is the only gate. Safe commands run freely; dangerous commands require your Slack approval.
-- **Inline mode**: YOLO off — Cursor's own UI prompts you for command approvals as normal.
-
-> **Note:** `/lassare-inline` always sets YOLO to `false`. If you prefer YOLO on in inline mode, re-enable it manually in `.vscode/settings.json` after switching.
+- Cursor installed
 
 ## Setup
 
 ### 1. Create directories
 
 ```bash
-mkdir -p .cursor/commands .cursor/scripts .cursor/hooks .lassare
+mkdir -p .cursor/commands .cursor/scripts .lassare
 ```
 
 ### 2. Add MCP config
@@ -47,16 +33,57 @@ If `.cursor/mcp.json` **already exists**, manually add the `lassare` entry from 
 
 Then replace `YOUR_API_KEY` with your API key.
 
-### 3. Copy commands, scripts, and hooks
+### 3. Copy commands and scripts
 
 ```bash
 cp commands/*.md .cursor/commands/
 cp scripts/*.sh .cursor/scripts/
-cp hooks/*.sh .cursor/hooks/
-chmod +x .cursor/scripts/*.sh .cursor/hooks/*.sh
+chmod +x .cursor/scripts/*.sh
 ```
 
-### 4. Add hook config
+### 4. Set default mode
+
+```bash
+.cursor/scripts/lassare-inline.sh
+```
+
+### 5. Restart Cursor and verify
+
+Restart Cursor, then check **Settings → MCP** — you should see `lassare` listed as connected. Try `/lassare-status` to confirm mode.
+
+## Usage
+
+- **`ask` tool**: Questions and clarifications
+  - **Slack mode**: Sent to your Slack DM — reply from your phone
+  - **Inline mode** (default): Asked directly in conversation
+- **`approve` tool**: Permission requests — Slack DM with Approve/Deny buttons
+
+Questions and approvals expire after **15 minutes** if not answered.
+
+Toggle with `/lassare-slack` or `/lassare-inline`.
+
+Switching modes automatically toggles YOLO mode in `.vscode/settings.json`:
+
+- **Slack mode**: YOLO on — the permission hook is the only gate. Safe commands run freely; dangerous commands require your Slack approval.
+- **Inline mode**: YOLO off — Cursor's own UI prompts you for command approvals as normal.
+
+> **Note:** `/lassare-inline` always sets YOLO to `false`. If you prefer YOLO on in inline mode, re-enable it manually in `.vscode/settings.json` after switching.
+
+## Optional: Hooks (Recommended for Slack Mode)
+
+**Why hooks matter:** Without hooks, when Cursor needs permission for a command, it blocks in your terminal waiting for you to click "Allow". If you're AFK, the agent is stuck. The only alternative is YOLO mode, which auto-approves everything — risky.
+
+Hooks route dangerous commands to Slack instead, so you can approve from your phone without giving the agent blanket permission.
+
+### 1. Copy hook files
+
+```bash
+mkdir -p .cursor/hooks
+cp hooks/*.sh .cursor/hooks/
+chmod +x .cursor/hooks/*.sh
+```
+
+### 2. Add hook config
 
 If `.cursor/hooks.json` **does not exist**:
 
@@ -66,35 +93,15 @@ cp hooks/hooks.json.example .cursor/hooks.json
 
 If it **already exists**, manually merge the `beforeShellExecution` and `stop` hook entries.
 
-### 5. Set default mode
+### 3. Verify hooks
 
-```bash
-.cursor/scripts/lassare-inline.sh
-```
+Check file permissions: `chmod +x .cursor/hooks/*.sh .cursor/scripts/*.sh`
 
-### 6. Restart Cursor and verify
+Verify `.cursor/hooks.json` is valid JSON.
 
-Restart Cursor, then check **Settings → MCP** — you should see `lassare` listed as connected.
-
-Try `/lassare-status` to confirm mode.
-
-## Usage
-
-Toggle with `/lassare-slack` or `/lassare-inline`.
-
-- **`ask` tool**: Questions and clarifications
-  - **Slack mode**: Sent to your Slack DM — reply from your phone
-  - **Inline mode** (default): Asked directly in conversation
-- **`approve` tool**: Permission requests — Slack DM with Approve/Deny buttons
-
-Questions and approvals expire after **15 minutes** if not answered.
-
-## Hooks
-
-Two hooks are included and recommended for Slack mode:
-
-- **permission-approve.sh** (`beforeShellExecution`) — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode with YOLO off, Cursor's UI handles it. Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh).
-- **stop-notify.sh** (`stop`) — When in Slack mode, asks via Slack "Anything else?" before allowing Cursor to stop. If you reply with a task, the agent continues. If you say "done" or don't reply, it switches back to inline mode.
+**What each hook does:**
+- **permission-approve.sh** — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode with YOLO off, Cursor's UI handles it. Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh).
+- **stop-notify.sh** — When in Slack mode, asks via Slack "Anything else?" before allowing Cursor to stop. If you reply with a task, the agent continues. If you say "done" or don't reply, it switches back to inline mode.
 
 Both hooks use `BASH_SOURCE` for path resolution, so they work correctly regardless of Cursor's working directory.
 
@@ -113,6 +120,11 @@ If it **already exists**, append the snippet:
 ```bash
 cat lassare-rules.txt >> .cursorrules
 ```
+
+## Compatibility
+
+- Hooks require Cursor with hooks support
+- MCP tools work with any Cursor version that supports MCP
 
 ## Troubleshooting
 

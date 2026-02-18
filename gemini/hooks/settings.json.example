@@ -21,6 +21,20 @@
           }
         ]
       }
+    ],
+    "AfterAgent": [
+      {
+        "enabled": true,
+        "hooks": [
+          {
+            "name": "lassare-stop-notify",
+            "type": "command",
+            "command": "$GEMINI_PROJECT_DIR/.gemini/hooks/stop-notify.sh",
+            "timeout": 900000,
+            "description": "Ask user via Slack before stopping (Slack mode only)"
+          }
+        ]
+      }
     ]
   }
 }
