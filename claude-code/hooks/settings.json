@@ -2,12 +2,11 @@
   "hooks": {
     "PermissionRequest": [
       {
-        "matcher": "Bash|Write|Edit",
         "hooks": [
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/permission-approve.sh",
-            "timeout": 300000
+            "timeout": 900000
           }
         ]
       }

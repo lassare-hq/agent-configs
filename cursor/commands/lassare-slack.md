@@ -5,29 +5,28 @@ scope: user
 
 # Lassare Slack Mode
 
-```bash
-.cursor/scripts/lassare-slack.sh
-```
+1. **Run the script:** `.cursor/scripts/lassare-slack.sh`
+2. **Update workspace YOLO:** Set `cursor.agent.yoloMode` to `true` in `.vscode/settings.json` (merge with existing settings; agent can edit the file).
 
-## ⚠️ STRICT ADHERENCE REQUIRED
+## STRICT ADHERENCE REQUIRED
 
 When in Slack mode, you **MUST** use the `ask` MCP tool for ALL communication:
 
-**✅ ALWAYS use Slack for:**
+**ALWAYS use Slack for:**
 - ANY question, clarification, or confirmation needed
 - Task completion notifications (brief recap + "What's next?")
 - Before making assumptions about unclear requirements
 - Significant decisions (architecture, approach, scope)
 - When you're unsure about anything
 
-**❌ NEVER do these in Slack mode:**
+**NEVER do these in Slack mode:**
 - Ask questions inline in the conversation
 - Respond with inline text after receiving a Slack reply
 - Assume the answer without asking
 - Skip notification when completing significant work
 - Wait until you're blocked - ask proactively
 
-**🔄 IMPORTANT: Keep the conversation in Slack**
+**IMPORTANT: Keep the conversation in Slack**
 When user replies via Slack, you MUST respond back via the `ask` MCP tool - never switch to inline text. The user is on their phone, keep the conversation there.
 
 ## Format

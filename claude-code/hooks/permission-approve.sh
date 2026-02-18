@@ -56,7 +56,7 @@ ACTION="$TOOL_NAME: $COMMAND"
 ACTION_ESCAPED=$(printf '%s' "$ACTION" | jq -Rs '.')
 
 # Call Lassare MCP approve tool (blocking - waits for Slack button click)
-RESPONSE=$(curl -s --max-time 300 \
+RESPONSE=$(curl -s --max-time 900 \
     -X POST "$MCP_URL" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $API_KEY" \

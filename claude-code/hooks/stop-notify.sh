@@ -5,8 +5,14 @@
 # Logic:
 # 1. Calls ask tool: "Claude is stopping. Anything else?"
 # 2. Waits for user response (blocking, up to 15 min)
-# 3. If user says "no/done/stop/ok" -> allows stop
-# 4. Otherwise -> blocks stop, includes user's response as new task
+# 3. If user says "no/done/stop/ok" -> BLOCKS stop with instruction to run /lassare-inline
+#    (Claude runs the skill, switches mode in-context, then stops on next attempt)
+# 4. If timeout/no response -> same as above (block + switch instruction)
+# 5. If user gives a task -> blocks stop, includes task
+#
+# Why block instead of allow? If we allow stop silently after switching mode.txt,
+# Claude doesn't notice the mode change and keeps using Slack MCP if session resumes.
+# Blocking forces Claude to run /lassare-inline so the mode switch happens in-context.
 
 MODE_FILE="$CLAUDE_PROJECT_DIR/.lassare/mode.txt"
 MCP_CONFIG="$CLAUDE_PROJECT_DIR/.mcp.json"
@@ -27,7 +33,8 @@ fi
 # Check if marker exists (user gave a task earlier, now allow stop)
 if [ -f "$STOP_MARKER" ]; then
     rm -f "$STOP_MARKER"
-    echo "inline" > "$MODE_FILE"
+    # Mode is still slack here — the previous task was completed.
+    # Allow stop without switching (user explicitly gave a task and it's done).
     exit 0
 fi
 
@@ -76,9 +83,12 @@ if echo "$ANSWER" | grep -qiE '\b(not|don.t|do not|never)\b'; then
     exit 0
 fi
 if echo "$ANSWER" | grep -qiE '\b(no|done|stop|nope|nothing|bye|exit|quit|end|finished|that.s all|all good)\b'; then
-    # User confirmed stop - switch to inline, clean marker, allow stop
+    # User confirmed stop - switch mode file and block stop with switch instruction
+    # Claude will run /lassare-inline (which updates in-context mode), then stop naturally
+    # On next stop attempt, hook sees inline mode and allows immediately (exit 0 above)
     echo "inline" > "$MODE_FILE"
     rm -f "$STOP_MARKER"
+    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nSlack session ended. Run /lassare-inline to switch to inline mode, then you may stop.\"}"
     exit 0
 fi
 
@@ -90,9 +100,10 @@ if [ -n "$ANSWER" ]; then
     ESCAPED_ANSWER=$(printf '%s' "$ANSWER" | jq -Rs '.' | sed 's/^"//;s/"$//')
     echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nUser responded via Slack with a new task. Please address: $ESCAPED_ANSWER\\n\\n[After completing this task, run: rm -f .lassare/stop-asked-marker]\"}"
 else
-    # No response or timeout - switch to inline, clean marker, allow stop
+    # No response or timeout - switch mode file and block stop with switch instruction
     echo "inline" > "$MODE_FILE"
     rm -f "$STOP_MARKER"
+    echo "{\"decision\":\"block\",\"reason\":\"Stop hook feedback:\\nSlack session timed out. Run /lassare-inline to switch to inline mode, then you may stop.\"}"
     exit 0
 fi
 

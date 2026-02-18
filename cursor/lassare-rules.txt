@@ -1,21 +1,24 @@
 # Lassare Integration
 
-After session restart, check `.lassare/mode.txt` and run the matching command:
+**After session resume/compaction**: Check `.lassare/mode.txt` for mode (`slack` or `inline`).
 - If `slack` → Run `/lassare-slack`
 - If `inline` (or missing) → Run `/lassare-inline`
 
 **When in Slack mode:**
-- Use the Lassare `ask` tool for all questions, clarifications, and progress updates
-- Notify via Slack when completing significant work
-- Ask via Slack before making assumptions — don't guess
-- Keep questions short (<100 chars), put details in the `context` field
-- In the `context` field, use real line breaks for readability — never use literal `\n` characters
-- When user replies via Slack, respond back via Slack — never switch to inline
 
-**Commands:**
-- `/lassare-slack` — Questions sent to your Slack DM
-- `/lassare-inline` — Questions asked in the conversation
-- `/lassare-status` — Check current mode
+Use the Lassare `ask` tool for ALL communication:
+- **ON SESSION START**: Greet the user via Slack before doing anything else
+- **AFTER COMPLETING WORK**: Ask "Anything else?" via Slack to keep session alive
+- **WHEN ASKING QUESTIONS**: Use the `ask` tool (blocks until answer) instead of inline text
+- **WHEN BLOCKED/WAITING**: Notify via Slack so user knows to check
+- **WHEN RESPONDING TO SLACK**: When user replies via Slack, respond back via Slack — NEVER switch to inline text
+
+**NEVER use inline text in Slack mode** — ALL communication must go through the Lassare `ask` tool.
+
+Keep questions short (<100 chars), put details in the `context` field.
+In the `context` field, use real line breaks for readability — never use literal `\n` characters.
+
+**Commands**: `/lassare-slack`, `/lassare-inline`, `/lassare-status`
 
 <!-- Optional: Uncomment to allow the agent to request yes/no approvals directly -->
 <!-- When you need a simple approve/deny decision, use the Lassare `approve` tool -->

@@ -5,9 +5,14 @@
 # Logic:
 # 1. Calls ask tool: "Gemini is stopping. Anything else?"
 # 2. Waits for user response (blocking, up to 15 min)
-# 3. If user says "no/done/stop/ok" -> allows stop, switches to inline
-# 4. Otherwise -> blocks stop (deny), feeds user's response as new task
-# 5. On error/timeout -> allows stop, switches to inline
+# 3. If user says "no/done/stop/ok" -> DENIES stop with instruction to run /lassare-inline
+#    (Gemini runs the command, switches mode in-context, then stops on next attempt)
+# 4. If timeout/no response -> same as above (deny + switch instruction)
+# 5. If user gives a task -> denies stop, feeds user's response as new task
+#
+# Why deny instead of allow? If we allow stop silently after switching mode.txt,
+# Gemini doesn't notice the mode change and keeps using Slack MCP if session resumes.
+# Denying forces Gemini to run /lassare-inline so the mode switch happens in-context.
 #
 # Gemini AfterAgent output format:
 # - Allow stop: exit 0 with no output
@@ -66,9 +71,10 @@ RESULT_LINE=$(echo "$RESPONSE" | grep '^data: ' | grep '"result"' | tail -1 | se
 ANSWER=$(echo "$RESULT_LINE" | jq -r '.result.content[0].text // ""' 2>/dev/null)
 ANSWER_LOWER=$(echo "$ANSWER" | tr '[:upper:]' '[:lower:]')
 
-# No response or timeout -> allow stop, switch to inline
+# No response or timeout -> switch mode file and deny stop with switch instruction
 if [ -z "$ANSWER" ]; then
     echo "inline" > "$MODE_FILE"
+    echo "{\"decision\":\"deny\",\"reason\":\"Slack session timed out. Run /lassare-inline to switch to inline mode, then you may stop.\"}"
     exit 0
 fi
 
@@ -81,11 +87,15 @@ fi
 
 # Check if user wants to stop
 if echo "$ANSWER_LOWER" | grep -qiE '\b(no|done|stop|nope|nothing|bye|exit|quit|end|finished|that.s all|all good|ok)\b'; then
+    # User confirmed stop - switch mode file and deny stop with switch instruction
+    # Gemini will run /lassare-inline (which updates in-context mode), then stop naturally
+    # On next stop attempt, hook sees inline mode and allows immediately (exit 0 above)
     echo "inline" > "$MODE_FILE"
+    echo "{\"decision\":\"deny\",\"reason\":\"Slack session ended. Run /lassare-inline to switch to inline mode, then you may stop.\"}"
     exit 0
 fi
 
-# User gave a task -> block stop, feed as new task
+# User gave a task -> deny stop, feed as new task
 ESCAPED_ANSWER=$(printf '%s' "$ANSWER" | jq -Rs '.' | sed 's/^"//;s/"$//')
 echo "{\"decision\":\"deny\",\"reason\":\"User responded via Slack with a new task: $ESCAPED_ANSWER\"}"
 

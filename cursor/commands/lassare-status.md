@@ -1,5 +1,5 @@
 ---
-description: Show current Lassare Slack/inline mode
+description: Show current Lassare mode and YOLO settings
 scope: user
 ---
 
@@ -9,4 +9,4 @@ scope: user
 .cursor/scripts/lassare-status.sh
 ```
 
-To change mode, run `/lassare-slack` or `/lassare-inline`.
+To change mode: `/lassare-slack` or `/lassare-inline`

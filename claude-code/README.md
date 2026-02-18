@@ -44,7 +44,7 @@ chmod +x .claude/scripts/*.sh
 ### 4. Set default mode
 
 ```bash
-echo "inline" > .lassare/mode.txt
+.claude/scripts/lassare-inline.sh
 ```
 
 ### 5. Restart Claude Code and verify

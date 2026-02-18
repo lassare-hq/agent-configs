@@ -2,12 +2,28 @@
 # Stop hook: Ask user via Slack before allowing Cursor to stop
 # Only active when in Slack mode
 #
+# Logic:
+# 1. Calls ask tool: "Cursor is stopping. Anything else?"
+# 2. Waits for user response (blocking, up to 15 min)
+# 3. If user says "no/done/stop/ok" -> BLOCKS stop with instruction to run /lassare-inline
+#    (Cursor runs the command, switches mode in-context, then stops on next attempt)
+# 4. If timeout/no response -> same as above (block + switch instruction)
+# 5. If user gives a task -> blocks stop, includes task
+#
+# Why block instead of allow? If we allow stop silently after switching mode.txt,
+# Cursor doesn't notice the mode change and keeps using Slack MCP if session resumes.
+# Blocking forces Cursor to run /lassare-inline so the mode switch happens in-context.
+#
 # Cursor hook format: Receives JSON via stdin
-# Returns JSON with followup_message to continue, or exits 0 to allow stop
+# Returns JSON with followup_message to block stop, or exits 0 to allow stop
 
-MODE_FILE=".lassare/mode.txt"
-MCP_CONFIG=".cursor/mcp.json"
-STOP_MARKER=".lassare/stop-asked-marker"
+# Resolve project root: hook lives at .cursor/hooks/ so project root is ../..
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+PROJECT_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+
+MODE_FILE="$PROJECT_ROOT/.lassare/mode.txt"
+MCP_CONFIG="$PROJECT_ROOT/.cursor/mcp.json"
+STOP_MARKER="$PROJECT_ROOT/.lassare/stop-asked-marker"
 
 # Check mode
 if [ -f "$MODE_FILE" ]; then
@@ -23,7 +39,8 @@ fi
 # Check if marker exists (user gave a task earlier, now allow stop)
 if [ -f "$STOP_MARKER" ]; then
     rm -f "$STOP_MARKER"
-    echo "inline" > "$MODE_FILE"
+    # Mode is still slack here — the previous task was completed.
+    # Allow stop without switching (user explicitly gave a task and it's done).
     exit 0
 fi
 
@@ -67,14 +84,18 @@ ANSWER=$(echo "$RESULT_LINE" | jq -r '.result.content[0].text // ""' 2>/dev/null
 if echo "$ANSWER" | grep -qiE '\b(not|don.t|do not|never)\b'; then
     # Negation detected — user does NOT want to stop, treat as a task
     touch "$STOP_MARKER"
-    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f .lassare/stop-asked-marker]' "$ANSWER")
+    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f %s]' "$ANSWER" "$STOP_MARKER")
     ANSWER_ESCAPED=$(printf '%s' "$ANSWER_WITH_CLEANUP" | jq -Rs '.')
     echo "{\"followup_message\": $ANSWER_ESCAPED}"
     exit 0
 fi
 if echo "$ANSWER" | grep -qiE '\b(no|done|stop|nope|nothing|bye|exit|quit|end|finished|that.s all|all good)\b'; then
+    # User confirmed stop - switch mode file and block stop with switch instruction
+    # Cursor will run /lassare-inline (which updates in-context mode), then stop naturally
+    # On next stop attempt, hook sees inline mode and allows immediately (exit 0 above)
     echo "inline" > "$MODE_FILE"
     rm -f "$STOP_MARKER"
+    echo '{"followup_message": "Slack session ended. Run /lassare-inline to switch to inline mode, then you may stop."}'
     exit 0
 fi
 
@@ -82,13 +103,14 @@ fi
 if [ -n "$ANSWER" ]; then
     touch "$STOP_MARKER"
     # Escape JSON to prevent injection
-    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f .lassare/stop-asked-marker]' "$ANSWER")
+    ANSWER_WITH_CLEANUP=$(printf '%s\n\n[After completing this task, run: rm -f %s]' "$ANSWER" "$STOP_MARKER")
     ANSWER_ESCAPED=$(printf '%s' "$ANSWER_WITH_CLEANUP" | jq -Rs '.')
     echo "{\"followup_message\": $ANSWER_ESCAPED}"
     exit 0
 else
-    # No response or timeout - switch to inline, clean marker, allow stop
+    # No response or timeout - switch mode file and block stop with switch instruction
     echo "inline" > "$MODE_FILE"
     rm -f "$STOP_MARKER"
+    echo '{"followup_message": "Slack session timed out. Run /lassare-inline to switch to inline mode, then you may stop."}'
     exit 0
 fi

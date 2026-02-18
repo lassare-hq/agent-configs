@@ -4,15 +4,13 @@
     "beforeShellExecution": [
       {
         "command": ".cursor/hooks/permission-approve.sh",
-        "timeout": 300,
-        "matcher": {
-          "tool_name": "Shell"
-        }
+        "timeout": 900
       }
     ],
     "stop": [
       {
-        "command": ".cursor/hooks/stop-notify.sh"
+        "command": ".cursor/hooks/stop-notify.sh",
+        "timeout": 900
       }
     ]
   }

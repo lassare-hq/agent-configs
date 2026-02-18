@@ -44,7 +44,7 @@ chmod +x .gemini/scripts/*.sh
 ### 4. Set default mode
 
 ```bash
-echo "inline" > .lassare/mode.txt
+.gemini/scripts/lassare-inline.sh
 ```
 
 ### 5. Restart Gemini CLI and verify
