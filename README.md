@@ -1,8 +1,8 @@
-# Lassare Agent Prompts
+# Lassare — Control Claude Code, Cursor & Gemini CLI Remotely
 
-Setup prompts and configuration files for integrating [Lassare](https://lassare.com) with AI coding agents.
+> Your AI coding agent keeps running. When it needs your input, Lassare sends the question to Slack. You answer from your phone. The agent continues.
 
-Lassare enables human-in-the-loop workflows for AI agents. When your coding agent needs to ask you a question or get approval for a risky action, it sends a message to your Slack DM — so you can respond from your phone while AFK.
+Lassare is an [MCP server](https://modelcontextprotocol.io/) that lets you respond to AI coding agent questions remotely via Slack — so you don't have to stay at your desk while your agent works.
 
 ## Supported Agents
 
@@ -14,7 +14,7 @@ Lassare enables human-in-the-loop workflows for AI agents. When your coding agen
 
 ### Other MCP Clients
 
-Lassare works with any MCP-compatible agent. Use the [generic config](./other/) as a starting point — includes MCP setup and guidance for implementing mode switching.
+Lassare works with any MCP-compatible agent (Windsurf, GitHub Copilot, Continue, Aider, and more). Use the [generic config](./other/) as a starting point.
 
 **Using a different agent?** [Let us know](https://github.com/lassare-hq/agent-configs/issues) what works or what you'd like us to support next.
 
@@ -30,14 +30,9 @@ Lassare works with any MCP-compatible agent. Use the [generic config](./other/) 
 ```
 ┌────────────────┐     ┌─────────────┐     ┌─────────────┐
 │  Your Agent    │────▶│   Lassare   │────▶│ Your Slack  │
-│ (ask / approve)│     │   (MCP)     │     │ (DM/mobile) │
+│ (ask / approve)│◀────│   (MCP)     │◀────│ (DM/mobile) │
 └────────────────┘     └─────────────┘     └─────────────┘
-                              │
-                              ▼
-                       ┌─────────────┐
-                       │ You respond │
-                       │ (from phone)│
-                       └─────────────┘
+  agent continues       relays answer        you respond
 ```
 
 **Two tools:**
@@ -46,12 +41,34 @@ Lassare works with any MCP-compatible agent. Use the [generic config](./other/) 
 
 Questions and approvals expire after **15 minutes** if not answered.
 
+## Common Questions
+
+**How do I control Claude Code remotely?**
+Add Lassare as an MCP server in your `.mcp.json`. When Claude Code needs input, it calls the `ask` tool — the question arrives on Slack, you respond from your phone, Claude Code continues.
+
+**Can I answer Cursor questions from my phone?**
+Yes. Configure Lassare in Cursor's MCP settings. When the agent hits a decision point, you get a Slack notification and reply from anywhere.
+
+**Does Gemini CLI work with Lassare?**
+Yes. Gemini CLI supports MCP servers. Add Lassare to your settings and agent questions arrive via Slack.
+
+**Can I use my AI coding agent while AFK?**
+That's exactly what Lassare is for. Your agent keeps running wherever it's running — you just answer questions remotely via Slack when it needs your input.
+
+**Is my code sent to Lassare?**
+No. Lassare only sees the questions your agent sends. Your code stays on your machine.
+
 ## Modes
 
 - **Inline mode** (default): Questions asked directly in the conversation — for when you're at your desk
 - **Slack mode**: Questions go to your Slack DM — respond from your phone while AFK
 
 Toggle with `/lassare-slack` or `/lassare-inline` commands.
+
+## Pricing
+
+- **Free**: 200 questions/month, no credit card required
+- **Solo**: $9/month for 1,700 questions/month
 
 ## Contributing
 
@@ -65,6 +82,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guideline
 
 ## Links
 
+- [Website](https://lassare.com) — How it works, setup guide, and pricing
 - [Portal](https://portal.lassare.com) — Get your API key
 - [Status](https://status.lassare.com) — Service status and uptime
 - [Feedback & Issues](https://github.com/lassare-hq/agent-configs/issues)
