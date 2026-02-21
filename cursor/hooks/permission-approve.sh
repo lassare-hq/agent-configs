@@ -7,12 +7,12 @@
 # 3. For dangerous commands:
 #    - Slack mode: request approval via Slack buttons
 #    - Inline mode + dialog ON: show native OS dialog (macOS/Windows/Linux)
-#    - Inline mode + dialog OFF (default): pass-through (allow)
+#    - Inline mode + dialog OFF: pass-through (allow)
 # 4. Fail-closed: any error in Slack mode → deny dangerous commands
 #
 # Config files:
 #   .lassare/mode.txt           - "slack" or "inline" (default: inline)
-#   .lassare/inline-dialog.txt  - "on" or "off" (default: off)
+#   .lassare/inline-dialog.txt  - "on" or "off" (default: on)
 #
 # Cursor hook format (beforeShellExecution):
 #   Input: {"command": "..."} via stdin
@@ -216,7 +216,7 @@ else
     if [ -f "$DIALOG_FILE" ]; then
         DIALOG=$(cat "$DIALOG_FILE" | tr -d '[:space:]')
     else
-        DIALOG="off"
+        DIALOG="on"
     fi
 
     if [ "$DIALOG" = "on" ]; then
@@ -229,7 +229,7 @@ else
             exit 2
         fi
     else
-        # Dialog disabled: pass-through (user accepts YOLO risk)
+        # Dialog disabled: pass-through (user opted out via /lassare-dialog-off)
         echo '{"permission": "allow"}'
         exit 0
     fi

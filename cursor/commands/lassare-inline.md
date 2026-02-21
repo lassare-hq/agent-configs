@@ -6,6 +6,6 @@ scope: user
 # Lassare Inline Mode
 
 1. **Run the script:** `.cursor/scripts/lassare-inline.sh`
-2. **Update workspace YOLO:** Set `cursor.agent.yoloMode` to `false` in `.vscode/settings.json` (merge with existing settings; agent can edit the file).
+Relay the dialog state from the script output to the user. If dialog is ON, dangerous commands will show a native OS popup. If OFF, they pass through. Toggle with `/lassare-dialog-on` or `/lassare-dialog-off`.
 
 Ask questions directly in this conversation.

@@ -12,15 +12,17 @@ else
 fi
 echo "Mode: $MODE"
 
-SETTINGS_FILE="$PROJECT_ROOT/.vscode/settings.json"
-if [ -f "$SETTINGS_FILE" ]; then
-  YOLO=$(grep -v '^[[:space:]]*//' "$SETTINGS_FILE" | jq -r '.["cursor.agent.yoloMode"] // false' 2>/dev/null)
+DIALOG_FILE="$PROJECT_ROOT/.lassare/inline-dialog.txt"
+if [ -f "$DIALOG_FILE" ]; then
+  DIALOG=$(cat "$DIALOG_FILE" | tr -d '[:space:]')
 else
-  YOLO="false"
+  DIALOG="on"
 fi
-echo "YOLO mode: $YOLO"
+echo "Inline dialog: $DIALOG (gates dangerous commands with OS popup when in inline mode)"
 
 echo ""
 echo "Commands:"
-echo "  /lassare-slack   - Slack mode (enables YOLO, hook gates dangerous commands)"
-echo "  /lassare-inline  - Inline mode (disables YOLO, Cursor UI handles approvals)"
+echo "  /lassare-slack       - Slack mode (hook gates dangerous commands; set Auto-Run in Sandbox + Allow All)"
+echo "  /lassare-inline      - Inline mode (Cursor Agent settings control approvals)"
+echo "  /lassare-dialog-on   - Enable OS dialog for dangerous commands in inline mode"
+echo "  /lassare-dialog-off  - Disable OS dialog (dangerous commands pass through)"

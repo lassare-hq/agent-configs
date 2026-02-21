@@ -62,16 +62,23 @@ Questions and approvals expire after **15 minutes** if not answered.
 
 Toggle with `/lassare-slack` or `/lassare-inline`.
 
-Switching modes automatically toggles YOLO mode in `.vscode/settings.json`:
+Switching modes requires **manual** Cursor Agent settings changes:
 
-- **Slack mode**: YOLO on — the permission hook is the only gate. Safe commands run freely; dangerous commands require your Slack approval.
-- **Inline mode**: YOLO off — Cursor's own UI prompts you for command approvals as normal.
+- **Slack mode**: Set **Auto-Run Mode** = *Auto-Run in Sandbox* and **Auto-Run Network Access** = *Allow All* (Cursor Settings → Agent). The permission hook gates dangerous commands via Slack approval.
+- **Inline mode**: Set **Auto-Run Mode** to *Ask every time* for manual approval prompts, or keep Sandbox mode and use the network/tool toggles.
 
-> **Note:** `/lassare-inline` always sets YOLO to `false`. If you prefer YOLO on in inline mode, re-enable it manually in `.vscode/settings.json` after switching.
+> **Why manual?** Cursor replaced YOLO mode with Sandbox mode (Feb 2025). Unlike the old `cursor.agent.yoloMode` setting, there is currently no file or API to toggle Sandbox programmatically. The commands remind you which settings to change, and the inline dialog acts as a safety net.
+
+### Inline dialog (dangerous command gate)
+
+When in inline mode, the permission hook shows a native OS dialog (macOS/Windows/Linux) for dangerous commands like `rm -rf`, `git push --force`, `sudo`, etc. This is **ON by default** — so even if you forget to switch Cursor back to *Ask every time*, dangerous commands still get caught.
+
+- `/lassare-dialog-on` — Enable OS dialog (default)
+- `/lassare-dialog-off` — Disable OS dialog (dangerous commands pass through)
 
 ## Optional: Hooks (Recommended for Slack Mode)
 
-**Why hooks matter:** Without hooks, when Cursor needs permission for a command, it blocks in your terminal waiting for you to click "Allow". If you're AFK, the agent is stuck. The only alternative is YOLO mode, which auto-approves everything — risky.
+**Why hooks matter:** Without hooks, when Cursor needs permission for a command, it blocks in your terminal waiting for you to click "Allow". If you're AFK, the agent is stuck. Sandbox mode auto-runs commands in an isolated environment, but some operations (force push, rm -rf, sudo) should still require explicit approval.
 
 Hooks route dangerous commands to Slack instead, so you can approve from your phone without giving the agent blanket permission.
 
@@ -100,7 +107,7 @@ Check file permissions: `chmod +x .cursor/hooks/*.sh .cursor/scripts/*.sh`
 Verify `.cursor/hooks.json` is valid JSON.
 
 **What each hook does:**
-- **permission-approve.sh** — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode with YOLO off, Cursor's UI handles it. Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh).
+- **permission-approve.sh** — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode, shows a native OS dialog for approval (on by default; toggle with `/lassare-dialog-on` and `/lassare-dialog-off`). Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh).
 - **stop-notify.sh** — When in Slack mode, asks via Slack "Anything else?" before allowing Cursor to stop. If you reply with a task, the agent continues. If you say "done" or don't reply, it switches back to inline mode.
 
 Both hooks use `BASH_SOURCE` for path resolution, so they work correctly regardless of Cursor's working directory.
@@ -145,10 +152,9 @@ cat lassare-rules.txt >> .cursorrules
 - Verify `.cursor/hooks.json` is valid JSON
 - Ensure `jq` is installed (`brew install jq` on macOS)
 
-**YOLO not toggling:**
-- The scripts write to `.vscode/settings.json` via the agent (not the shell script directly, due to sandbox restrictions)
-- The command files instruct the agent to update the setting after running the script
-- Check `/lassare-status` to see current YOLO state
+**Agent not auto-running commands:**
+- Check Cursor Settings → Agent: **Auto-Run Mode** should be *Auto-Run in Sandbox* and **Auto-Run Network Access** should be *Allow All*
+- Check `/lassare-status` to see current mode
 
 **Script "Operation not permitted":**
 - Cursor's sandbox may block shell scripts from writing to `.vscode/`. This is expected — the agent edits the file directly instead. The command files handle this split.
@@ -156,8 +162,8 @@ cat lassare-rules.txt >> .cursorrules
 ## Files
 
 - `mcp.json` — MCP server configuration
-- `commands/*.md` — Slash commands (mode switching, status)
-- `scripts/*.sh` — Mode switching scripts (called by commands)
+- `commands/*.md` — Slash commands (mode switching, status, dialog toggle)
+- `scripts/*.sh` — Mode switching and dialog toggle scripts (called by commands)
 - `hooks/permission-approve.sh` — Dangerous command gate (Slack approval or OS dialog)
 - `hooks/stop-notify.sh` — Stop hook (asks via Slack before stopping)
 - `hooks/hooks.json.example` — Hook config (copy to `.cursor/hooks.json`)

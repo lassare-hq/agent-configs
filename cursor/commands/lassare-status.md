@@ -1,5 +1,5 @@
 ---
-description: Show current Lassare mode and YOLO settings
+description: Show current Lassare mode and Cursor Agent setup reminder
 scope: user
 ---
 

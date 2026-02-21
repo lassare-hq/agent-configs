@@ -1,12 +1,16 @@
 # Lassare Integration
 
+**Cursor Agent setup (required):** In Cursor Settings → Agent, set:
+- **Auto-Run Mode:** Auto-Run in Sandbox
+- **Auto-Run Network Access:** Allow All
+
 **After session resume/compaction**: Check `.lassare/mode.txt` for mode (`slack` or `inline`).
 - If `slack` → Run `/lassare-slack`
 - If `inline` (or missing) → Run `/lassare-inline`
 
 **When in Slack mode:**
 
-Use the Lassare `ask` tool for ALL communication:
+Use the Lassare `ask` MCP tool for ALL communication. **Invocation:** `call_mcp_tool` with `toolName: "ask"`, `arguments: { question, context }`. Use `server: "lassare"` first; if Cursor errors with "Available servers: ...", use the server id that corresponds to Lassare from that list (e.g. project-0-lassare-lassare).
 - **ON SESSION START**: Greet the user via Slack before doing anything else
 - **AFTER COMPLETING WORK**: Ask "Anything else?" via Slack to keep session alive
 - **WHEN ASKING QUESTIONS**: Use the `ask` tool (blocks until answer) instead of inline text

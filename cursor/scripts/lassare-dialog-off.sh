@@ -4,7 +4,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 mkdir -p "$PROJECT_ROOT/.lassare"
-echo "slack" > "$PROJECT_ROOT/.lassare/mode.txt"
-rm -f "$PROJECT_ROOT/.lassare/stop-asked-marker"
-
-echo "Switched to SLACK mode (use Auto-Run in Sandbox + Allow All network; hook gates dangerous commands)"
+echo "off" > "$PROJECT_ROOT/.lassare/inline-dialog.txt"
+echo "Inline dialog: OFF — dangerous commands pass through without approval"
