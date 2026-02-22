@@ -4,6 +4,8 @@
 - **Auto-Run Mode:** Auto-Run in Sandbox
 - **Auto-Run Network Access:** Allow All
 
+(YOLO mode in workspace settings is obsolete; sandbox controls behavior.)
+
 **After session resume/compaction**: Check `.lassare/mode.txt` for mode (`slack` or `inline`).
 - If `slack` → Run `/lassare-slack`
 - If `inline` (or missing) → Run `/lassare-inline`

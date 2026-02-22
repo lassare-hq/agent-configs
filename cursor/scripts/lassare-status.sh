@@ -16,7 +16,7 @@ DIALOG_FILE="$PROJECT_ROOT/.lassare/inline-dialog.txt"
 if [ -f "$DIALOG_FILE" ]; then
   DIALOG=$(cat "$DIALOG_FILE" | tr -d '[:space:]')
 else
-  DIALOG="on"
+  DIALOG="off"
 fi
 echo "Inline dialog: $DIALOG (gates dangerous commands with OS popup when in inline mode)"
 

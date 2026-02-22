@@ -216,7 +216,7 @@ else
     if [ -f "$DIALOG_FILE" ]; then
         DIALOG=$(cat "$DIALOG_FILE" | tr -d '[:space:]')
     else
-        DIALOG="on"
+        DIALOG="off"
     fi
 
     if [ "$DIALOG" = "on" ]; then
