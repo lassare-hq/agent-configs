@@ -68,7 +68,7 @@ Toggle with `/lassare-slack` or `/lassare-inline` commands.
 ## Pricing
 
 - **Free**: 200 questions/month, no credit card required
-- **Solo**: $9/month for 1,700 questions/month
+- **Solo**: $9/month for 2,000 questions/month
 
 ## Contributing
 
