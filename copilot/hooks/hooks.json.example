@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": ".github/hooks/permission-approve.sh",
+        "timeout": 900
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": ".github/hooks/stop-notify.sh",
+        "timeout": 900
+      }
+    ]
+  }
+}

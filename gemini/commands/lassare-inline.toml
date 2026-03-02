@@ -2,11 +2,13 @@
 
 description = "Switch to inline mode - questions asked directly in conversation"
 prompt = """
-Switch to inline mode by running this shell command:
+## ⚠️ FIRST: Execute this script in the terminal (MANDATORY, do NOT skip)
 
 ```bash
 .gemini/scripts/lassare-inline.sh
 ```
+
+You MUST run the script above BEFORE doing anything else. This persists the mode to disk.
 
 ## ⚠️ IMPORTANT: Disable YOLO mode
 

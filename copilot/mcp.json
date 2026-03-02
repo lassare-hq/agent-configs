@@ -1,0 +1,19 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "lassare-api-key",
+      "description": "Lassare API key (from portal.lassare.com → Agent Setup)",
+      "password": true
+    }
+  ],
+  "servers": {
+    "lassare": {
+      "type": "sse",
+      "url": "https://mcp.lassare.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:lassare-api-key}"
+      }
+    }
+  }
+}

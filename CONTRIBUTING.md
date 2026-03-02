@@ -18,8 +18,8 @@ Good configs should:
 
 - Be concise but clear
 - Explain when to use Slack mode vs inline mode
-- Include the `/lassare-slack` toggle command
-- Follow the agent's conventions (e.g., markdown for Claude, TOML for Gemini)
+- Include all five `/lassare-*` toggle commands
+- Follow the agent's conventions for command format (e.g., `.md` for Claude, `.toml` for Gemini, `.prompt.md` for Copilot)
 - Include a persistent instructions snippet (for surviving context compressions)
 
 ### Folder Structure
@@ -34,8 +34,17 @@ agent-name/
 ├── commands/              # Slash commands (if supported)
 │   ├── lassare-slack.*
 │   ├── lassare-inline.*
-│   └── lassare-status.*
-└── hooks/                 # Hook scripts (if supported)
+│   ├── lassare-status.*
+│   ├── lassare-dialog-on.*
+│   └── lassare-dialog-off.*
+├── scripts/               # Shell scripts invoked by commands/hooks
+│   ├── lassare-slack.sh
+│   ├── lassare-inline.sh
+│   ├── lassare-status.sh
+│   ├── lassare-dialog-on.sh
+│   └── lassare-dialog-off.sh
+└── hooks/                 # Hook scripts and config (if supported)
+    ├── [config-example]   # e.g., hooks.json.example, settings.json.example
     ├── permission-approve.sh
     └── stop-notify.sh
 ```

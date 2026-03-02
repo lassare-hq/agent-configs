@@ -5,7 +5,9 @@ scope: user
 
 # Lassare Slack Mode
 
-1. **Run the script:** `.cursor/scripts/lassare-slack.sh`
+## ⚠️ FIRST: Execute this script in the terminal (MANDATORY, do NOT skip)
+
+1. **Run the script NOW:** `.cursor/scripts/lassare-slack.sh` — execute it before doing anything else. This persists the mode to disk.
 2. **Cursor Agent settings:** Ensure Auto-Run Mode = *Auto-Run in Sandbox* and Auto-Run Network Access = *Allow All* (Cursor Settings → Agent).
 
 ## STRICT ADHERENCE REQUIRED

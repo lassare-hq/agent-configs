@@ -1,38 +1,37 @@
 ---
 description: Switch to Slack mode - questions sent to your Slack DM
-scope: user
 ---
 
 # Lassare Slack Mode
 
-## ⚠️ FIRST: Execute this script using the Bash tool (MANDATORY, do NOT skip)
+## ⚠️ FIRST: You MUST run this command yourself (do NOT ask the user to run it)
 
 ```bash
-.claude/scripts/lassare-slack.sh
+.github/scripts/lassare-slack.sh
 ```
 
-You MUST run the script above using the Bash tool BEFORE doing anything else. This persists the mode to disk.
+Run the command above in the terminal NOW, before doing anything else.
 
-## ⚠️ STRICT ADHERENCE REQUIRED
+## STRICT ADHERENCE REQUIRED
 
-When in Slack mode, you **MUST** use `mcp__lassare__ask` for ALL communication:
+When in Slack mode, you **MUST** use the `ask` MCP tool for ALL communication:
 
-**✅ ALWAYS use Slack for:**
+**ALWAYS use Slack for:**
 - ANY question, clarification, or confirmation needed
 - Task completion notifications (brief recap + "What's next?")
 - Before making assumptions about unclear requirements
 - Significant decisions (architecture, approach, scope)
 - When you're unsure about anything
 
-**❌ NEVER do these in Slack mode:**
-- Use `AskUserQuestion` tool (inline questions)
+**NEVER do these in Slack mode:**
+- Ask questions inline in the conversation
 - Respond with inline text after receiving a Slack reply
 - Assume the answer without asking
 - Skip notification when completing significant work
 - Wait until you're blocked - ask proactively
 
-**🔄 IMPORTANT: Keep the conversation in Slack**
-When user replies via Slack, you MUST respond back via `mcp__lassare__ask` - never switch to inline text. The user is on their phone, keep the conversation there.
+**IMPORTANT: Keep the conversation in Slack**
+When user replies via Slack, you MUST respond back via the `ask` MCP tool - never switch to inline text. The user is on their phone, keep the conversation there.
 
 ## Format
 
@@ -59,11 +58,4 @@ Ready to commit."
 question: "Should activity log show user email or ID?"
 context: "Currently shows obfuscated email.
 Could show user_id instead for better privacy."
-```
-
-**Before assuming:**
-```
-question: "No tests exist for this. Should I add them?"
-context: "Adding plan filter to companies list.
-No existing test coverage for filters."
 ```

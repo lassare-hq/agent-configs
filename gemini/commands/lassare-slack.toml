@@ -2,11 +2,13 @@
 
 description = "Switch to Slack mode - questions sent to your Slack DM, dangerous commands require Slack approval"
 prompt = """
-Switch to Slack mode by running this shell command:
+## ⚠️ FIRST: Execute this script in the terminal (MANDATORY, do NOT skip)
 
 ```bash
 .gemini/scripts/lassare-slack.sh
 ```
+
+You MUST run the script above BEFORE doing anything else. This persists the mode to disk.
 
 ## ⚠️ IMPORTANT: Enable YOLO mode
 
