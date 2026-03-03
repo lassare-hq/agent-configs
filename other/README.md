@@ -107,9 +107,11 @@ cat instructions-snippet.md >> YOUR_AGENT_INSTRUCTIONS_FILE
 
 ## Hooks (If Supported)
 
-If your agent supports hooks/callbacks for tool approval, you can route permission requests through Slack instead of blocking at the terminal. This lets you approve risky actions from your phone without using YOLO mode.
+Without hooks, your agent blocks at the terminal for every permission prompt — if you're AFK, it's stuck. Most agents offer an auto-approve (YOLO) mode to avoid this, but that gives the agent blanket permission for everything.
 
-See the tested agent configs for hook implementation examples.
+Lassare hooks give you the best of both: enable auto-approve to keep the agent moving, and hooks intercept dangerous commands (`rm -rf`, `git push --force`, `sudo`, etc.) and route them to Slack for your approval. The list of dangerous commands is customizable in `permission-approve.sh`.
+
+See the tested agent configs ([Claude Code](../claude-code/), [Copilot](../copilot/), [Cursor](../cursor/), [Gemini](../gemini/)) for hook implementation examples.
 
 ## Troubleshooting
 

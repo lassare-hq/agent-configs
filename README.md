@@ -1,4 +1,4 @@
-# Lassare — Control Claude Code, Cursor & Gemini CLI Remotely
+# Lassare — Control Claude Code, Copilot, Cursor & Gemini CLI Remotely
 
 > Your AI coding agent keeps running. When it needs your input, Lassare sends the question to Slack. You answer from your phone. The agent continues.
 
@@ -9,12 +9,13 @@ Lassare is an [MCP server](https://modelcontextprotocol.io/) that lets you respo
 ### Tested & Documented
 
 - **[Claude Code](./claude-code/)** — MCP config, slash commands, hooks
+- **[GitHub Copilot (VS Code)](./copilot/)** `NEW` — MCP config, prompt files, hooks
 - **[Cursor](./cursor/)** — MCP config, slash commands, hooks
 - **[Gemini CLI](./gemini/)** — MCP config, slash commands, hooks
 
 ### Other MCP Clients
 
-Lassare works with any MCP-compatible agent (Windsurf, GitHub Copilot, Continue, Aider, and more). Use the [generic config](./other/) as a starting point.
+Lassare works with any MCP-compatible agent (Windsurf, Continue, Aider, and more). Use the [generic config](./other/) as a starting point.
 
 **Using a different agent?** [Let us know](https://github.com/lassare-hq/agent-configs/issues) what works or what you'd like us to support next.
 
@@ -24,6 +25,8 @@ Lassare works with any MCP-compatible agent (Windsurf, GitHub Copilot, Continue,
 2. **Get your API key** from Agent Setup
 3. **Choose your agent** from the folders above
 4. **Follow the README** in that folder
+
+> Setup is manual — you copy config files into your project. This keeps everything transparent and customizable with no hidden dependencies.
 
 ## How It Works
 
@@ -39,6 +42,12 @@ Lassare works with any MCP-compatible agent (Windsurf, GitHub Copilot, Continue,
 1. **`ask`** — Agent needs clarification → you get a Slack DM → reply with your answer
 2. **`approve`** — Agent needs permission for a risky action → you get Approve/Deny buttons in Slack
 
+**Hooks** (included for supported agents):
+- Auto-approve mode keeps the agent moving between questions
+- Lassare hooks intercept dangerous commands (`rm -rf`, `git push --force`, `sudo`, etc.) and route them to Slack — so you stay in control from anywhere
+- The list of dangerous commands is customizable in `permission-approve.sh`
+- A stop hook asks "Anything else?" before the agent stops
+
 Questions and approvals expire after **15 minutes** if not answered.
 
 ## Common Questions
@@ -48,6 +57,9 @@ Add Lassare as an MCP server in your `.mcp.json`. When Claude Code needs input, 
 
 **Can I answer Cursor questions from my phone?**
 Yes. Configure Lassare in Cursor's MCP settings. When the agent hits a decision point, you get a Slack notification and reply from anywhere.
+
+**Does GitHub Copilot in VS Code work with Lassare?**
+Yes. VS Code 1.109+ supports MCP servers and agent hooks. Add Lassare to `.vscode/mcp.json` and enable hooks for remote approval of dangerous commands.
 
 **Does Gemini CLI work with Lassare?**
 Yes. Gemini CLI supports MCP servers. Add Lassare to your settings and agent questions arrive via Slack.
@@ -64,6 +76,8 @@ No. Lassare only sees the questions your agent sends. Your code stays on your ma
 - **Slack mode**: Questions go to your Slack DM — respond from your phone while AFK
 
 Toggle with `/lassare-slack` or `/lassare-inline` commands.
+
+> **Note:** Hook behavior depends on your agent's version and may change with updates. If something stops working after an agent update, [open an issue](https://github.com/lassare-hq/agent-configs/issues). To propose changes, [submit a PR](https://github.com/lassare-hq/agent-configs/pulls).
 
 ## Pricing
 

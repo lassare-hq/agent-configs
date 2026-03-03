@@ -12,13 +12,14 @@ Setup instructions for integrating Lassare with [Gemini CLI](https://github.com/
 - Slack workspace connected (Portal → Agent Setup)
 - An API key (Portal → Agent Setup)
 - Gemini CLI installed
+- `jq` installed (`brew install jq` on macOS, `apt install jq` on Linux)
 
 ## Setup
 
 ### 1. Create directories
 
 ```bash
-mkdir -p .gemini/commands .gemini/scripts .lassare
+mkdir -p .gemini/commands .gemini/scripts .gemini/hooks .lassare
 ```
 
 ### 2. Add MCP config
@@ -41,71 +42,12 @@ cp scripts/*.sh .gemini/scripts/
 chmod +x .gemini/scripts/*.sh
 ```
 
-### 4. Set default mode
+### 4. Copy hooks
 
 ```bash
-.gemini/scripts/lassare-inline.sh
-```
-
-### 5. Restart Gemini CLI and verify
-
-Restart Gemini CLI. Try `/lassare-status` to confirm mode.
-
-## Usage
-
-- **`ask` tool**: Questions and clarifications
-  - **Slack mode**: Sent to your Slack DM — reply from your phone
-  - **Inline mode** (default): Asked directly in conversation
-- **`approve` tool**: Permission requests — Slack DM with Approve/Deny buttons
-
-Questions and approvals expire after **15 minutes** if not answered.
-
-Toggle with `/lassare-slack` or `/lassare-inline`.
-
-### Modes
-
-| Mode | Questions | Dangerous Commands | Safe Commands |
-|------|-----------|-------------------|---------------|
-| **Slack** | via Slack DM | Slack approval required | auto-approved |
-| **Inline** (default) | in conversation | Gemini CLI prompts | Gemini CLI prompts |
-
-### Commands
-
-| Command | Description |
-|---------|-------------|
-| `/lassare-slack` | Switch to Slack mode |
-| `/lassare-inline` | Switch to inline mode |
-| `/lassare-status` | Show current mode and settings |
-| `/lassare-dialog-on` | Enable OS dialog for dangerous commands (inline mode) |
-| `/lassare-dialog-off` | Disable OS dialog |
-
-### YOLO Mode
-
-| Mode | YOLO | Behavior |
-|------|------|----------|
-| Slack | ON (recommended) | Hook gates dangerous commands via Slack, safe commands auto-approve |
-| Slack | OFF | Double prompting (Gemini native + Slack) — works but annoying |
-| Inline | OFF (recommended) | Gemini CLI prompts for dangerous commands |
-| Inline + dialog ON | ON or OFF | Hook shows OS popup for dangerous commands |
-| Inline + dialog OFF | ON | **No safety net** — dangerous commands run without any approval |
-
-## Optional: Hooks (Recommended for Slack Mode)
-
-**Why hooks matter:** Without hooks, when Gemini CLI needs permission for a command, it blocks at your terminal for approval. If you're AFK, the agent is stuck. The only alternative is YOLO mode, which auto-approves everything — risky.
-
-Hooks route dangerous commands to Slack for approval, while safe commands pass through automatically.
-
-**Requirement:** Hooks require Gemini CLI Preview/Nightly channel, or explicit enablement on Stable.
-
-### 1. Copy hook files
-
-```bash
-mkdir -p .gemini/hooks
 cp hooks/*.sh .gemini/hooks/
 chmod +x .gemini/hooks/*.sh
 ```
-
-### 2. Add hook config
 
 Manually merge the following into your existing `.gemini/settings.json`:
 
@@ -152,15 +94,59 @@ Manually merge the following into your existing `.gemini/settings.json`:
 }
 ```
 
-### 3. Verify hooks
-
-```
-/hooks panel
-```
-
 **What each hook does:**
-- **permission-approve.sh** — Auto-allows lassare scripts, `.lassare/` file operations, and MCP tools. Checks dangerous command patterns against a built-in list. In Slack mode, gates dangerous commands via Slack approval buttons. In inline mode + dialog ON, shows native OS popup (macOS/Windows/Linux). In inline mode + dialog OFF, passes through and lets Gemini handle it. Fail-closed in Slack mode: errors deny dangerous commands.
+- **permission-approve.sh** — Auto-allows lassare scripts, `.lassare/` file operations, and MCP tools. Checks dangerous command patterns against a built-in list. In Slack mode, gates dangerous commands via Slack approval buttons. In inline mode + dialog ON, shows native OS popup (macOS/Windows/Linux). In inline mode + dialog OFF, passes through and lets Gemini handle it. Fail-closed in Slack mode: errors deny dangerous commands. Edit the pattern list in `permission-approve.sh` to customize.
 - **stop-notify.sh** — Only active in Slack mode (exits immediately in inline mode). Asks "Anything else?" via Slack when Gemini is about to stop. User can reply with a new task (agent continues) or say "done" (agent stops). On timeout/no response: allows stop, switches to inline mode.
+
+> **Note:** Hooks require Gemini CLI Preview/Nightly channel, or explicit enablement on Stable.
+
+### 5. Set default mode
+
+```bash
+.gemini/scripts/lassare-inline.sh
+```
+
+### 6. Restart Gemini CLI and verify
+
+Restart Gemini CLI. Run `/hooks panel` to verify hooks are loaded. Try `/lassare-status` to confirm mode.
+
+## Usage
+
+- **`ask` tool**: Questions and clarifications
+  - **Slack mode**: Sent to your Slack DM — reply from your phone
+  - **Inline mode** (default): Asked directly in conversation
+- **`approve` tool**: Permission requests — Slack DM with Approve/Deny buttons
+
+Questions and approvals expire after **15 minutes** if not answered.
+
+Toggle with `/lassare-slack` or `/lassare-inline`.
+
+### Modes
+
+| Mode | Questions | Dangerous Commands | Safe Commands |
+|------|-----------|-------------------|---------------|
+| **Slack** | via Slack DM | Slack approval required | auto-approved |
+| **Inline** (default) | in conversation | Gemini CLI prompts | Gemini CLI prompts |
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/lassare-slack` | Switch to Slack mode |
+| `/lassare-inline` | Switch to inline mode |
+| `/lassare-status` | Show current mode and settings |
+| `/lassare-dialog-on` | Enable OS dialog for dangerous commands (inline mode) |
+| `/lassare-dialog-off` | Disable OS dialog |
+
+### YOLO Mode
+
+| Mode | YOLO | Behavior |
+|------|------|----------|
+| Slack | ON (recommended) | Hook gates dangerous commands via Slack, safe commands auto-approve |
+| Slack | OFF | Double prompting (Gemini native + Slack) — works but annoying |
+| Inline | OFF (recommended) | Gemini CLI prompts for dangerous commands |
+| Inline + dialog ON | ON or OFF | Hook shows OS popup for dangerous commands |
+| Inline + dialog OFF | ON | **No safety net** — dangerous commands run without any approval |
 
 ### Dangerous commands (blocked in Slack mode)
 
@@ -247,7 +233,7 @@ cat gemini-md-snippet.md >> GEMINI.md
 - `mcp.json` — MCP server configuration
 - `commands/*.toml` — Slash commands (5 commands)
 - `scripts/*.sh` — Shell scripts called by commands (5 scripts)
-- `hooks/permission-approve.sh` — Permission hook (optional, recommended)
-- `hooks/stop-notify.sh` — Stop notification hook (optional, recommended)
+- `hooks/permission-approve.sh` — Permission hook
+- `hooks/stop-notify.sh` — Stop notification hook
 - `hooks/settings.json.example` — Hook config reference
 - `gemini-md-snippet.md` — GEMINI.md snippet (optional, recommended)

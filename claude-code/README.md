@@ -41,13 +41,34 @@ cp scripts/*.sh .claude/scripts/
 chmod +x .claude/scripts/*.sh
 ```
 
-### 4. Set default mode
+### 4. Copy hooks
+
+```bash
+mkdir -p .claude/hooks
+cp hooks/*.sh .claude/hooks/
+chmod +x .claude/hooks/*.sh
+```
+
+If `.claude/settings.json` **does not exist**:
+
+```bash
+cp hooks/settings.json .claude/settings.json
+```
+
+If it **already exists**, manually merge the `hooks` section from `hooks/settings.json` into your existing file.
+
+**What each hook does:**
+- **permission-approve.sh** — Routes tool permission requests to Slack (Approve/Deny buttons). Edit the pattern list in `permission-approve.sh` to customize which commands require approval.
+- **stop-notify.sh** — Asks via Slack before Claude stops ("Anything else?")
+- **session-start.sh** — Reminds Claude to use Slack mode on session start
+
+### 5. Set default mode
 
 ```bash
 .claude/scripts/lassare-inline.sh
 ```
 
-### 5. Restart Claude Code and verify
+### 6. Restart Claude Code and verify
 
 Restart Claude Code, then run:
 
@@ -55,7 +76,7 @@ Restart Claude Code, then run:
 /mcp
 ```
 
-You should see `lassare` listed as a connected MCP server. Try `/lassare-status` to confirm mode.
+You should see `lassare` listed as a connected MCP server. Run `/hooks` to verify hooks are loaded. Try `/lassare-status` to confirm mode.
 
 ## Usage
 
@@ -67,45 +88,6 @@ You should see `lassare` listed as a connected MCP server. Try `/lassare-status`
 Questions and approvals expire after **15 minutes** if not answered.
 
 Toggle with `/lassare-slack` or `/lassare-inline`.
-
-## Optional: Hooks (Recommended for Slack Mode)
-
-**Why hooks matter:** Without hooks, when Claude needs permission for a tool (like running a bash command), it blocks in your terminal waiting for you to click "Allow". If you're AFK, the agent is stuck. The only alternative is YOLO mode, which auto-approves everything — risky.
-
-Hooks route permission requests to Slack instead, so you can approve from your phone without giving the agent blanket permission.
-
-### 1. Copy hook files
-
-```bash
-mkdir -p .claude/hooks
-cp hooks/*.sh .claude/hooks/
-chmod +x .claude/hooks/*.sh
-```
-
-### 2. Add hook config
-
-If `.claude/settings.json` **does not exist**:
-
-```bash
-cp hooks/settings.json .claude/settings.json
-```
-
-If it **already exists**, manually merge the `hooks` section from `hooks/settings.json` into your existing file.
-
-### 3. Verify hooks
-
-Restart Claude Code and run:
-
-```
-/hooks
-```
-
-You should see the permission, stop, and session-start hooks listed.
-
-**What each hook does:**
-- **permission-approve.sh** — Routes tool permission requests to Slack (Approve/Deny buttons)
-- **stop-notify.sh** — Asks via Slack before Claude stops ("Anything else?")
-- **session-start.sh** — Reminds Claude to use Slack mode on session start
 
 ## Optional: CLAUDE.md Snippet
 
@@ -151,8 +133,8 @@ cat claude-md-snippet.md >> CLAUDE.md
 - `mcp.json` — MCP server configuration
 - `commands/*.md` — Slash commands
 - `scripts/*.sh` — Mode switching scripts (called by commands)
-- `hooks/permission-approve.sh` — Permission hook (optional)
-- `hooks/stop-notify.sh` — Stop hook (optional)
-- `hooks/session-start.sh` — Session start hook (optional)
+- `hooks/permission-approve.sh` — Permission hook
+- `hooks/stop-notify.sh` — Stop hook
+- `hooks/session-start.sh` — Session start hook
 - `hooks/settings.json` — Hook config
 - `claude-md-snippet.md` — CLAUDE.md snippet (optional, recommended)

@@ -12,13 +12,14 @@ Setup instructions for integrating Lassare with [Cursor](https://cursor.sh).
 - Slack workspace connected (Portal → Agent Setup)
 - An API key (Portal → Agent Setup)
 - Cursor installed
+- `jq` installed (`brew install jq` on macOS, `apt install jq` on Linux)
 
 ## Setup
 
 ### 1. Create directories
 
 ```bash
-mkdir -p .cursor/commands .cursor/scripts .lassare
+mkdir -p .cursor/commands .cursor/scripts .cursor/hooks .lassare
 ```
 
 ### 2. Add MCP config
@@ -41,15 +42,34 @@ cp scripts/*.sh .cursor/scripts/
 chmod +x .cursor/scripts/*.sh
 ```
 
-### 4. Set default mode
+### 4. Copy hooks
+
+```bash
+cp hooks/*.sh .cursor/hooks/
+chmod +x .cursor/hooks/*.sh
+```
+
+If `.cursor/hooks.json` **does not exist**:
+
+```bash
+cp hooks/hooks.json.example .cursor/hooks.json
+```
+
+If it **already exists**, manually merge the `beforeShellExecution` and `stop` hook entries.
+
+**What each hook does:**
+- **permission-approve.sh** — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode, shows a native OS dialog for approval (on by default; toggle with `/lassare-dialog-on` and `/lassare-dialog-off`). Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh). Edit the pattern list in `permission-approve.sh` to customize.
+- **stop-notify.sh** — When in Slack mode, asks via Slack "Anything else?" before allowing Cursor to stop. If you reply with a task, the agent continues. If you say "done" or don't reply, it switches back to inline mode.
+
+### 5. Set default mode
 
 ```bash
 .cursor/scripts/lassare-inline.sh
 ```
 
-### 5. Restart Cursor and verify
+### 6. Restart Cursor and verify
 
-Restart Cursor, then check **Settings → MCP** — you should see `lassare` listed as connected. Try `/lassare-status` to confirm mode.
+Restart Cursor, then check **Settings → MCP** — you should see `lassare` listed as connected. Verify `.cursor/hooks.json` is valid JSON. Try `/lassare-status` to confirm mode.
 
 ## Usage
 
@@ -75,42 +95,6 @@ When in inline mode, the permission hook shows a native OS dialog (macOS/Windows
 
 - `/lassare-dialog-on` — Enable OS dialog (default)
 - `/lassare-dialog-off` — Disable OS dialog (dangerous commands pass through)
-
-## Optional: Hooks (Recommended for Slack Mode)
-
-**Why hooks matter:** Without hooks, when Cursor needs permission for a command, it blocks in your terminal waiting for you to click "Allow". If you're AFK, the agent is stuck. Sandbox mode auto-runs commands in an isolated environment, but some operations (force push, rm -rf, sudo) should still require explicit approval.
-
-Hooks route dangerous commands to Slack instead, so you can approve from your phone without giving the agent blanket permission.
-
-### 1. Copy hook files
-
-```bash
-mkdir -p .cursor/hooks
-cp hooks/*.sh .cursor/hooks/
-chmod +x .cursor/hooks/*.sh
-```
-
-### 2. Add hook config
-
-If `.cursor/hooks.json` **does not exist**:
-
-```bash
-cp hooks/hooks.json.example .cursor/hooks.json
-```
-
-If it **already exists**, manually merge the `beforeShellExecution` and `stop` hook entries.
-
-### 3. Verify hooks
-
-Check file permissions: `chmod +x .cursor/hooks/*.sh .cursor/scripts/*.sh`
-
-Verify `.cursor/hooks.json` is valid JSON.
-
-**What each hook does:**
-- **permission-approve.sh** — Gates dangerous shell commands. In Slack mode, sends approval request to Slack. In inline mode, shows a native OS dialog for approval (on by default; toggle with `/lassare-dialog-on` and `/lassare-dialog-off`). Dangerous patterns include: `rm -rf`, `git push --force`, `sudo`, `kill`, `npm publish`, `docker rm`, and [30+ others](hooks/permission-approve.sh).
-- **stop-notify.sh** — When in Slack mode, asks via Slack "Anything else?" before allowing Cursor to stop. If you reply with a task, the agent continues. If you say "done" or don't reply, it switches back to inline mode.
-
-Both hooks use `BASH_SOURCE` for path resolution, so they work correctly regardless of Cursor's working directory.
 
 ## Optional: .cursorrules Snippet
 
